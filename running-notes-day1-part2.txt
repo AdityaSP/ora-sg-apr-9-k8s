@@ -406,3 +406,31 @@ REVISION  CHANGE-CAUSE
 
 Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
 λ
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+1. create service
+kubectl apply -f service/svc-helloworld.yml
+
+2. create deployment
+kubectl apply -f dep/dep-helloworld.yml
+
+3. know ip address of pods
+kubectl get pods -o wide
+
+4. check service description
+kubectl describe svc hw-svc
+
+5. check logs of pods
+kubectl logs -f helloworld-dep-7cb9c5d4b-kn7fp
+
+6. while true; do curl 192.168.99.100:31001; done
+
+
+
+
+
+
+
