@@ -1,0 +1,210 @@
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ pwd
+/d/training/k8s/k8s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ ls
+blog/  build-machine/  dep/  newcluster/  pod/  pv-pvc/  rc/  readme.txt  resource-quota/  service/
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl version
+Client Version: version.Info{Major:"1", Minor:"18", GitVersion:"v1.18.0", GitCommit:"9e991415386e4cf155a24b1da15becaa390438d8", GitTreeState:"clean", BuildDate:"2020-03-25T14:58:59Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"windows/amd64"}
+Server Version: version.Info{Major:"1", Minor:"18", GitVersion:"v1.18.0", GitCommit:"9e991415386e4cf155a24b1da15becaa390438d8", GitTreeState:"clean", BuildDate:"2020-03-25T14:50:46Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl create -f pod/pod-helloworld.yml
+pod/my-nginx created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+my-nginx   1/1     Running   0          3m8s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe pod my-nginx
+Name:         my-nginx
+Namespace:    default
+Priority:     0
+Node:         minikube/192.168.99.100
+Start Time:   Thu, 09 Apr 2020 09:00:29 +0530
+Labels:       app=helloworld2
+Annotations:  <none>
+Status:       Running
+IP:           172.17.0.4
+IPs:
+  IP:  172.17.0.4
+Containers:
+  web:
+    Container ID:   docker://b9f768fc7516c79d0ba52c2933b502ea99d9538f6179aa422589121eb0274908
+    Image:          nginx:alpine
+    Image ID:       docker-pullable://nginx@sha256:abe5ce652eb78d9c793df34453fddde12bb4d93d9fbf2c363d0992726e4d2cad
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 09 Apr 2020 09:00:30 +0530
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-vzklz (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  default-token-vzklz:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-vzklz
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  4m52s  default-scheduler  Successfully assigned default/my-nginx to minikube
+  Normal  Pulled     4m51s  kubelet, minikube  Container image "nginx:alpine" already present on machine
+  Normal  Created    4m51s  kubelet, minikube  Created container web
+  Normal  Started    4m51s  kubelet, minikube  Started container web
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ minikube ip
+192.168.99.100
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ # log in to minikube using docker/tcuser
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+my-nginx   1/1     Running   0          30m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -o wide
+NAME       READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+my-nginx   1/1     Running   0          30m   172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pod -o wide
+NAME       READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+my-nginx   1/1     Running   0          32m   172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get po -o wide
+NAME       READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+my-nginx   1/1     Running   0          32m   172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl delete pod my-nginx
+pod "my-nginx" deleted
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
+
+
+
+
+--------------------------EXECUTE THE BELOW BY LOGGING into minikube through ip "minikube ip" uname/pwd : docker/tcuser
+----------------------------------------------------------------------------------------------------------------
+
+$ ps -ef | grep dockerd
+root      2550     1  1 00:44 ?        00:01:48 /usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --default-ulimit=nofile=1048576:1048576 --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem --label provider=virtualbox --insecure-registry 10.96.0.0/12
+docker    9145  9005  0 03:41 pts/1    00:00:00 grep dockerd
+$ docker container ls
+CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS               NAMES
+b9f768fc7516        377c0837328f           "nginx -g 'daemon of…"   11 minutes ago      Up 11 minutes                           k8s_web_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+6db5815fdabd        k8s.gcr.io/pause:3.2   "/pause"                 11 minutes ago      Up 11 minutes                           k8s_POD_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+5d01fd81bc3c        67da37a9a360           "/coredns -conf /etc…"   3 hours ago         Up 3 hours                              k8s_coredns_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-4489-8568-9967d55ecec8_0
+2ca6fe86f63b        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-4489-8568-9967d55ecec8_0
+6fbef5ff856b        67da37a9a360           "/coredns -conf /etc…"   3 hours ago         Up 3 hours                              k8s_coredns_coredns-66bff467f8-mwmmc_kube-system_ed3b22f9-55ca-4bcb-955e-bc2ac8d5622d_0
+a6208adc2e6a        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_coredns-66bff467f8-mwmmc_kube-system_ed3b22f9-55ca-4bcb-955e-bc2ac8d5622d_0
+f5ed795ad34a        4689081edb10           "/storage-provisioner"   3 hours ago         Up 3 hours                              k8s_storage-provisioner_storage-provisioner_kube-system_8c64dcdc-4567-4988-a45f-89b491570470_0
+b14ebb9d5008        43940c34f24f           "/usr/local/bin/kube…"   3 hours ago         Up 3 hours                              k8s_kube-proxy_kube-proxy-54dxp_kube-system_a9ce2cd0-1229-476c-80a8-21f21017bd08_0
+462485563d4d        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_storage-provisioner_kube-system_8c64dcdc-4567-4988-a45f-89b491570470_0
+c55d583b3533        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_kube-proxy-54dxp_kube-system_a9ce2cd0-1229-476c-80a8-21f21017bd08_0
+fed0ba0522e4        a31f78c7c8ce           "kube-scheduler --au…"   3 hours ago         Up 3 hours                              k8s_kube-scheduler_kube-scheduler-minikube_kube-system_5795d0c442cb997ff93c49feeb9f6386_0
+5654e42d6106        d3e55153f52f           "kube-controller-man…"   3 hours ago         Up 3 hours                              k8s_kube-controller-manager_kube-controller-manager-minikube_kube-system_3016593d20758bbfe68aba26604a8e3d_0
+d81bae03db75        303ce5db0e90           "etcd --advertise-cl…"   3 hours ago         Up 3 hours                              k8s_etcd_etcd-minikube_kube-system_e3064b4cb5e1ec4220321aede0b3cc10_0
+d8ab95a90598        74060cea7f70           "kube-apiserver --ad…"   3 hours ago         Up 3 hours                              k8s_kube-apiserver_kube-apiserver-minikube_kube-system_90fc8f3b59010208ae7f84386223a7d3_0
+50eda709b52b        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_kube-scheduler-minikube_kube-system_5795d0c442cb997ff93c49feeb9f6386_0
+7d1a14a9ec1f        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_kube-controller-manager-minikube_kube-system_3016593d20758bbfe68aba26604a8e3d_0
+79f0163b40bb        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_kube-apiserver-minikube_kube-system_90fc8f3b59010208ae7f84386223a7d3_0
+ad85a7474d33        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago         Up 3 hours                              k8s_POD_etcd-minikube_kube-system_e3064b4cb5e1ec4220321aede0b3cc10_0
+$ docker container ls
+CONTAINER ID        IMAGE                  COMMAND                  CREATED     TS               NAMES
+b9f768fc7516        377c0837328f           "nginx -g 'daemon of…"   11 minutes a                 k8s_web_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+6db5815fdabd        k8s.gcr.io/pause:3.2   "/pause"                 11 minutes a                 k8s_POD_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+5d01fd81bc3c        67da37a9a360           "/coredns -conf /etc…"   3 hours ago                  k8s_coredns_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-
+2ca6fe86f63b        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-4489
+6fbef5ff856b        67da37a9a360           "/coredns -conf /etc…"   3 hours ago                  k8s_coredns_coredns-66bff467f8-mwmmc_kube-system_ed3b22f9-55ca-
+a6208adc2e6a        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_coredns-66bff467f8-mwmmc_kube-system_ed3b22f9-55ca-4bcb
+f5ed795ad34a        4689081edb10           "/storage-provisioner"   3 hours ago                  k8s_storage-provisioner_storage-provisioner_kube-system_8c64dcd
+b14ebb9d5008        43940c34f24f           "/usr/local/bin/kube…"   3 hours ago                  k8s_kube-proxy_kube-proxy-54dxp_kube-system_a9ce2cd0-1229-476c-
+462485563d4d        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_storage-provisioner_kube-system_8c64dcdc-4567-4988-a45f
+c55d583b3533        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_kube-proxy-54dxp_kube-system_a9ce2cd0-1229-476c-80a8-21
+fed0ba0522e4        a31f78c7c8ce           "kube-scheduler --au…"   3 hours ago                  k8s_kube-scheduler_kube-scheduler-minikube_kube-system_5795d0c4
+5654e42d6106        d3e55153f52f           "kube-controller-man…"   3 hours ago                  k8s_kube-controller-manager_kube-controller-manager-minikube_kua26604a8e3d_0
+d81bae03db75        303ce5db0e90           "etcd --advertise-cl…"   3 hours ago                  k8s_etcd_etcd-minikube_kube-system_e3064b4cb5e1ec4220321aede0b3
+d8ab95a90598        74060cea7f70           "kube-apiserver --ad…"   3 hours ago                  k8s_kube-apiserver_kube-apiserver-minikube_kube-system_90fc8f3b
+50eda709b52b        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_kube-scheduler-minikube_kube-system_5795d0c442cb997ff93
+7d1a14a9ec1f        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_kube-controller-manager-minikube_kube-system_3016593d20
+79f0163b40bb        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_kube-apiserver-minikube_kube-system_90fc8f3b59010208ae7
+ad85a7474d33        k8s.gcr.io/pause:3.2   "/pause"                 3 hours ago                  k8s_POD_etcd-minikube_kube-system_e3064b4cb5e1ec4220321aede0b3c
+$ docker container inspect b9f768fc7516 | grep -i ipaddress
+            "SecondaryIPAddresses": null,
+            "IPAddress": "",
+$ docker container inspect 6db5815fdabd | grep -i ipaddress
+            "SecondaryIPAddresses": null,
+            "IPAddress": "172.17.0.4",
+                    "IPAddress": "172.17.0.4",
+$ curl 172.17.0.4:80
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+$
+$ docker container ls | head -4
+CONTAINER ID        IMAGE                  COMMAND                  CREATED     TS               NAMES
+b9f768fc7516        377c0837328f           "nginx -g 'daemon of…"   25 minutes a                 k8s_web_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+6db5815fdabd        k8s.gcr.io/pause:3.2   "/pause"                 25 minutes a                 k8s_POD_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+5d01fd81bc3c        67da37a9a360           "/coredns -conf /etc…"   3 hours ago                  k8s_coredns_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-
+$ docker container rm -f b9f768fc7516
+b9f768fc7516
+$ docker container ls | head -4
+CONTAINER ID        IMAGE                  COMMAND                  CREATED     TS               NAMES
+d3d6954577d6        377c0837328f           "nginx -g 'daemon of…"   2 seconds ag                 k8s_web_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+6db5815fdabd        k8s.gcr.io/pause:3.2   "/pause"                 26 minutes a                 k8s_POD_my-nginx_default_d55a8476-1d53-4a31-bb83-8bf4bc33614c_0
+5d01fd81bc3c        67da37a9a360           "/coredns -conf /etc…"   3 hours ago                  k8s_coredns_coredns-66bff467f8-j4zlf_kube-system_7d7dd035-e5cd-
+$
+
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------END OF EXECUTION ON minikube VM
+
+
+
+
+
