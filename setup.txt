@@ -1,0 +1,2 @@
+https://kubernetes.io/docs/setup/learning-environment/minikube/#installation
+https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-windows
