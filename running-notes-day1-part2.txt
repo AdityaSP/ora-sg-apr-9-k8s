@@ -1,0 +1,408 @@
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                          READY   STATUS    RESTARTS   AGE
+helloworld-controller-f77ch   1/1     Running   0          21m
+helloworld-controller-vbcs4   1/1     Running   0          21m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl delete -f rc/rc-helloworld.yml
+replicationcontroller "helloworld-controller" deleted
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f dep/dep-helloworld.yml
+error: unable to recognize "dep/dep-helloworld.yml": no matches for kind "Deployment" in version "extensions/v1beta1"
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f dep/dep-helloworld.yml
+The Deployment "helloworld-dep" is invalid: spec.template.metadata.labels: Invalid value: map[string]string{"app":"helloworld"}: `selector` does not match template `labels`
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f dep/dep-helloworld.yml
+The Deployment "helloworld-dep" is invalid: spec.template.metadata.labels: Invalid value: map[string]string{"app":"helloworld"}: `selector` does not match template `labels`
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f dep/dep-helloworld.yml
+deployment.apps/helloworld-dep created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-dep   1/1     1            1           55s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe deploy
+Name:                   helloworld-dep
+Namespace:              default
+CreationTimestamp:      Thu, 09 Apr 2020 12:02:18 +0530
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=helloworld
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=helloworld
+  Containers:
+   web:
+    Image:        nginx:alpine
+    Port:         80/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   helloworld-dep-7cb9c5d4b (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  78s   deployment-controller  Scaled up replica set helloworld-dep-7cb9c5d4b to 1
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get replicaset helloworld-dep-7cb9c5d4b
+NAME                       DESIRED   CURRENT   READY   AGE
+helloworld-dep-7cb9c5d4b   1         1         1       2m45s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe rs helloworld-dep-7cb9c5d4b
+Name:           helloworld-dep-7cb9c5d4b
+Namespace:      default
+Selector:       app=helloworld,pod-template-hash=7cb9c5d4b
+Labels:         app=helloworld
+                pod-template-hash=7cb9c5d4b
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/helloworld-dep
+Replicas:       1 current / 1 desired
+Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=helloworld
+           pod-template-hash=7cb9c5d4b
+  Containers:
+   web:
+    Image:        nginx:alpine
+    Port:         80/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  3m6s  replicaset-controller  Created pod: helloworld-dep-7cb9c5d4b-snmbn
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running   0          3m16s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-dep --replicas 5
+deployment.apps/helloworld-dep scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+helloworld-dep-7cb9c5d4b-hbvv2   1/1     Running   0          8s
+helloworld-dep-7cb9c5d4b-mqgpm   1/1     Running   0          8s
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running   0          5m4s
+helloworld-dep-7cb9c5d4b-xtmdf   1/1     Running   0          7s
+helloworld-dep-7cb9c5d4b-xvn4v   1/1     Running   0          8s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods --show-labels
+NAME                             READY   STATUS    RESTARTS   AGE     LABELS
+helloworld-dep-7cb9c5d4b-hbvv2   1/1     Running   0          80s     app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-mqgpm   1/1     Running   0          80s     app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running   0          6m16s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xtmdf   1/1     Running   0          79s     app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xvn4v   1/1     Running   0          80s     app=helloworld,pod-template-hash=7cb9c5d4b
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pod/pod-helloworld.yml
+pod/my-nginx created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods --show-labels
+NAME                             READY   STATUS    RESTARTS   AGE     LABELS
+helloworld-dep-7cb9c5d4b-hbvv2   1/1     Running   0          2m29s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-mqgpm   1/1     Running   0          2m29s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running   0          7m25s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xtmdf   1/1     Running   0          2m28s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xvn4v   1/1     Running   0          2m29s   app=helloworld,pod-template-hash=7cb9c5d4b
+my-nginx                         1/1     Running   0          3s      app=helloworld
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ #kubectl apply -f dep/dep-helloworld.yml
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f dep/dep-helloworld.yml
+deployment.apps/helloworld-dep configured
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods --show-labels
+NAME                             READY   STATUS        RESTARTS   AGE     LABELS
+helloworld-dep-7cb9c5d4b-mqgpm   1/1     Running       0          5m35s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running       0          10m     app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xtmdf   0/1     Terminating   0          5m34s   app=helloworld,pod-template-hash=7cb9c5d4b
+helloworld-dep-7cb9c5d4b-xvn4v   0/1     Terminating   0          5m35s   app=helloworld,pod-template-hash=7cb9c5d4b
+my-nginx                         1/1     Running       0          3m9s    app=helloworld
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-dep   2/2     2            2           12m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs
+NAME                       DESIRED   CURRENT   READY   AGE
+helloworld-dep-7cb9c5d4b   2         2         2       12m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+helloworld-dep-7cb9c5d4b-mqgpm   1/1     Running   0          7m40s
+helloworld-dep-7cb9c5d4b-snmbn   1/1     Running   0          12m
+my-nginx                         1/1     Running   0          5m14s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl set image deploy helloworld-dep  web=nginx:latest
+deployment.apps/helloworld-dep image updated
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+helloworld-dep-7789fbb99d-pphkn   0/1     ContainerCreating   0          10s
+helloworld-dep-7cb9c5d4b-mqgpm    1/1     Running             0          10m
+helloworld-dep-7cb9c5d4b-snmbn    1/1     Running             0          15m
+my-nginx                          1/1     Running             0          8m17s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS    RESTARTS   AGE
+helloworld-dep-7789fbb99d-pphkn   1/1     Running   0          67s
+helloworld-dep-7789fbb99d-vfjv6   1/1     Running   0          16s
+my-nginx                          1/1     Running   0          9m14s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe pod helloworld-dep-7789fbb99d-pphkn | grep -i image
+    Image:          nginx:latest
+    Image ID:       docker-pullable://nginx@sha256:282530fcb7cd19f3848c7b611043f82ae4be3781cb00105a1d593d7e6286b596
+  Normal  Pulling    99s   kubelet, minikube  Pulling image "nginx:latest"
+  Normal  Pulled     51s   kubelet, minikube  Successfully pulled image "nginx:latest"
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status deploy helloworld-dep
+deployment "helloworld-dep" successfully rolled out
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-dep --replicas 10
+deployment.apps/helloworld-dep scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS    RESTARTS   AGE
+helloworld-dep-7789fbb99d-cj4xg   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-j4jz5   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-jbgxr   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-mjp58   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-nc4hc   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-nctwt   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-pphkn   1/1     Running   0          4m40s
+helloworld-dep-7789fbb99d-sgzf4   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-t4kq2   1/1     Running   0          13s
+helloworld-dep-7789fbb99d-vfjv6   1/1     Running   0          3m49s
+my-nginx                          1/1     Running   0          12m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe pod helloworld-dep-7789fbb99d-cj4xg | grep -i image
+    Image:          nginx:latest
+    Image ID:       docker-pullable://nginx@sha256:282530fcb7cd19f3848c7b611043f82ae4be3781cb00105a1d593d7e6286b596
+  Normal  Pulled     25s   kubelet, minikube  Container image "nginx:latest" already present on machine
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status deploy helloworld-dep
+deployment "helloworld-dep" successfully rolled out
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl set image deploy helloworld-dep  web=nginx:mainline
+deployment.apps/helloworld-dep image updated
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status deploy helloworld-dep
+Waiting for deployment "helloworld-dep" rollout to finish: 5 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 5 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 5 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 5 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 5 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 9 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 9 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 9 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 9 out of 10 new replicas have been updated...
+Waiting for deployment "helloworld-dep" rollout to finish: 3 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 3 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 3 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "helloworld-dep" rollout to finish: 8 of 10 updated replicas are available...
+Waiting for deployment "helloworld-dep" rollout to finish: 9 of 10 updated replicas are available...
+deployment "helloworld-dep" successfully rolled out
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+helloworld-dep-955454878-4bww5   1/1     Running   0          2m54s
+helloworld-dep-955454878-6hk8h   1/1     Running   0          2m54s
+helloworld-dep-955454878-m4gf2   1/1     Running   0          2m54s
+helloworld-dep-955454878-m4qrq   1/1     Running   0          2m34s
+helloworld-dep-955454878-n959g   1/1     Running   0          2m28s
+helloworld-dep-955454878-qclmq   1/1     Running   0          2m30s
+helloworld-dep-955454878-qfkgk   1/1     Running   0          2m32s
+helloworld-dep-955454878-wbjtf   1/1     Running   0          2m36s
+helloworld-dep-955454878-wxnxg   1/1     Running   0          2m54s
+helloworld-dep-955454878-z4k2m   1/1     Running   0          2m54s
+my-nginx                         1/1     Running   0          17m
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs
+NAME                        DESIRED   CURRENT   READY   AGE
+helloworld-dep-7789fbb99d   0         0         0       9m37s
+helloworld-dep-7cb9c5d4b    0         0         0       25m
+helloworld-dep-955454878    10        10        10      3m9s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep
+deployment.apps/helloworld-dep
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+3         <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep --revision 1
+deployment.apps/helloworld-dep with revision #1
+Pod Template:
+  Labels:       app=helloworld
+        pod-template-hash=7cb9c5d4b
+  Containers:
+   web:
+    Image:      nginx:alpine
+    Port:       80/TCP
+    Host Port:  0/TCP
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep --revision 2
+deployment.apps/helloworld-dep with revision #2
+Pod Template:
+  Labels:       app=helloworld
+        pod-template-hash=7789fbb99d
+  Containers:
+   web:
+    Image:      nginx:latest
+    Port:       80/TCP
+    Host Port:  0/TCP
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep --revision 3
+deployment.apps/helloworld-dep with revision #3
+Pod Template:
+  Labels:       app=helloworld
+        pod-template-hash=955454878
+  Containers:
+   web:
+    Image:      nginx:mainline
+    Port:       80/TCP
+    Host Port:  0/TCP
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep
+deployment.apps/helloworld-dep
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+3         <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ #kubectl rollout undo deploy helloworld-dep --to-revision 1
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs
+NAME                        DESIRED   CURRENT   READY   AGE
+helloworld-dep-7789fbb99d   0         0         0       14m
+helloworld-dep-7cb9c5d4b    0         0         0       29m
+helloworld-dep-955454878    10        10        10      8m2s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout undo deploy helloworld-dep --to-revision 1
+deployment.apps/helloworld-dep rolled back
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs
+NAME                        DESIRED   CURRENT   READY   AGE
+helloworld-dep-7789fbb99d   0         0         0       15m
+helloworld-dep-7cb9c5d4b    5         5         0       30m
+helloworld-dep-955454878    8         8         8       8m36s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs
+NAME                        DESIRED   CURRENT   READY   AGE
+helloworld-dep-7789fbb99d   0         0         0       15m
+helloworld-dep-7cb9c5d4b    10        10        10      30m
+helloworld-dep-955454878    0         0         0       8m49s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout history deploy helloworld-dep
+deployment.apps/helloworld-dep
+REVISION  CHANGE-CAUSE
+2         <none>
+3         <none>
+4         <none>
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
