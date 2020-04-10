@@ -1,9 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blog-db-dep
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: blog-db
   template:
     metadata:
       labels:
@@ -19,8 +22,9 @@ spec:
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: welcome
-          
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,7 +34,7 @@ spec:
   - port: 8888
     targetPort: dbport
     protocol: TCP
+  #Selector helps to identify the ipaddresses of the pods to which this service has to load balance  
   selector:
     app: blog-db
   type: ClusterIP
-

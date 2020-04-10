@@ -1,9 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blog-ghost-dep
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: blog-ghost
   template:
     metadata:
       labels:
@@ -31,6 +34,7 @@ spec:
           value: ghost
 
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -38,10 +42,10 @@ metadata:
 spec:
   ports:
   - port: 8888
-    nodePort: 32005
     targetPort: ghostport
+    nodePort: 32001
     protocol: TCP
+  #Selector helps to identify the ipaddresses of the pods to which this service has to load balance  
   selector:
     app: blog-ghost
   type: NodePort
-
