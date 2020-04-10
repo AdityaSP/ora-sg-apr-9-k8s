@@ -509,3 +509,207 @@ sayhiregularly-1586501940-r77gs   0/1     ContainerCreating   0          5s
 
 Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
 λ
+
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply resource-quota/
+helloworld-with-quotas.yml  resourcequota.yml
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply resource-quota/resourcequota.yml
+error: must specify one of -f and -k
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f resource-quota/resourcequota.yml
+namespace/myspace created
+resourcequota/compute-quota created
+resourcequota/object-quota created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get ns
+NAME                   STATUS   AGE
+default                Active   31h
+kube-node-lease        Active   31h
+kube-public            Active   31h
+kube-system            Active   31h
+kubernetes-dashboard   Active   89m
+myspace                Active   17s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f resource-quota/helloworld-with-quotas.yml
+deployment.apps/helloworld-deployment created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -ns myspace
+Error from server (NotFound): namespaces "s" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -n myspace
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-deployment   1/1     1            1           17s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 2
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 3
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -n myspace
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-deployment   3/3     3            3           81s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 4
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -n myspace
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-deployment   3/4     4            3           87s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -n myspace
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-deployment   4/4     4            4           91s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 5
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get deploy -n myspace
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld-deployment   4/5     4            4           107s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe deploy -n myspace
+Name:                   helloworld-deployment
+Namespace:              myspace
+CreationTimestamp:      Fri, 10 Apr 2020 13:21:17 +0530
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=helloworld
+Replicas:               5 desired | 4 updated | 4 total | 4 available | 1 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=helloworld
+  Containers:
+   k8s-demo:
+    Image:      nginx:alpine
+    Port:       80/TCP
+    Host Port:  0/TCP
+    Limits:
+      cpu:     200m
+      memory:  256Mi
+    Requests:
+      cpu:        100m
+      memory:     256Mi
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type             Status  Reason
+  ----             ------  ------
+  Progressing      True    NewReplicaSetAvailable
+  Available        True    MinimumReplicasAvailable
+  ReplicaFailure   True    FailedCreate
+OldReplicaSets:    <none>
+NewReplicaSet:     helloworld-deployment-669d6bc494 (4/5 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m35s  deployment-controller  Scaled up replica set helloworld-deployment-669d6bc494 to 1
+  Normal  ScalingReplicaSet  88s    deployment-controller  Scaled up replica set helloworld-deployment-669d6bc494 to 2
+  Normal  ScalingReplicaSet  77s    deployment-controller  Scaled up replica set helloworld-deployment-669d6bc494 to 3
+  Normal  ScalingReplicaSet  70s    deployment-controller  Scaled up replica set helloworld-deployment-669d6bc494 to 4
+  Normal  ScalingReplicaSet  56s    deployment-controller  Scaled up replica set helloworld-deployment-669d6bc494 to 5
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get rs -n myspace
+NAME                               DESIRED   CURRENT   READY   AGE
+helloworld-deployment-669d6bc494   5         4         4       2m29s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe rs -n myspace
+Name:           helloworld-deployment-669d6bc494
+Namespace:      myspace
+Selector:       app=helloworld,pod-template-hash=669d6bc494
+Labels:         app=helloworld
+                pod-template-hash=669d6bc494
+Annotations:    deployment.kubernetes.io/desired-replicas: 5
+                deployment.kubernetes.io/max-replicas: 7
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/helloworld-deployment
+Replicas:       4 current / 5 desired
+Pods Status:    4 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=helloworld
+           pod-template-hash=669d6bc494
+  Containers:
+   k8s-demo:
+    Image:      nginx:alpine
+    Port:       80/TCP
+    Host Port:  0/TCP
+    Limits:
+      cpu:     200m
+      memory:  256Mi
+    Requests:
+      cpu:        100m
+      memory:     256Mi
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type             Status  Reason
+  ----             ------  ------
+  ReplicaFailure   True    FailedCreate
+Events:
+  Type     Reason            Age                From                   Message
+  ----     ------            ----               ----                   -------
+  Normal   SuccessfulCreate  3m21s              replicaset-controller  Created pod: helloworld-deployment-669d6bc494-hsszn
+  Normal   SuccessfulCreate  2m14s              replicaset-controller  Created pod: helloworld-deployment-669d6bc494-6lmd7
+  Normal   SuccessfulCreate  2m3s               replicaset-controller  Created pod: helloworld-deployment-669d6bc494-jwbnd
+  Normal   SuccessfulCreate  116s               replicaset-controller  Created pod: helloworld-deployment-669d6bc494-gnw6m
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-x6clj" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-2lnzh" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-qbcqs" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-jn9cj" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-sbhvx" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-hw757" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      102s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-mg6nx" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      101s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-4pc7c" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      101s               replicaset-controller  Error creating: pods "helloworld-deployment-669d6bc494-44l4l" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+  Warning  FailedCreate      61s (x5 over 99s)  replicaset-controller  (combined from similar events): Error creating: pods "helloworld-deployment-669d6bc494-xhmtz" is forbidden: exceeded quota: compute-quota, requested: limits.memory=256Mi,requests.memory=256Mi, used: limits.memory=1Gi,requests.memory=1Gi, limited: limits.memory=1Gi,requests.memory=1Gi
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 4
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy helloworld-deployment -n myspace --replicas 5
+deployment.apps/helloworld-deployment scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status -n myspace deploy helloworld-deploy
+Error from server (NotFound): deployments.apps "helloworld-deploy" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status  deploy helloworld-deploy -n myspace
+Error from server (NotFound): deployments.apps "helloworld-deploy" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl rollout status  deploy helloworld-deployment -n myspace
+Waiting for deployment "helloworld-deployment" rollout to finish: 4 out of 5 new replicas have been updated...
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
