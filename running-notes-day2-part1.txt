@@ -1,0 +1,270 @@
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl create -f new-blog/blog-db.yml
+deployment.apps/blog-db-dep created
+service/blog-db-svc created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                             READY   STATUS              RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86     0/1     ContainerCreating   0          14s
+helloworld-dep-7cb9c5d4b-kn7fp   1/1     Running             0          19h
+helloworld-dep-7cb9c5d4b-zp4cg   1/1     Running             0          19h
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -o wide
+NAME                             READY   STATUS              RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+blog-db-dep-6fc6b79587-nms86     0/1     ContainerCreating   0          25s   <none>       minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-kn7fp   1/1     Running             0          19h   172.17.0.5   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-zp4cg   1/1     Running             0          19h   172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get svc
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+blog-db-svc   ClusterIP   10.106.129.114   <none>        8888/TCP         39s
+hw-svc        NodePort    10.100.33.205    <none>        8888:31001/TCP   19h
+kubernetes    ClusterIP   10.96.0.1        <none>        443/TCP          26h
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-db-svc
+Name:              blog-db-svc
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=blog-db
+Type:              ClusterIP
+IP:                10.106.129.114
+Port:              <unset>  8888/TCP
+TargetPort:        dbport/TCP
+Endpoints:         <none>
+Session Affinity:  None
+Events:
+  Type     Reason                        Age   From                       Message
+  ----     ------                        ----  ----                       -------
+  Warning  FailedToUpdateEndpointSlices  99s   endpoint-slice-controller  Error updating Endpoint Slices for Service default/blog-db-svc: Error updating blog-db-svc-dn5cl EndpointSlice for Service default/blog-db-svc: endpointslices.discovery.k8s.io "blog-db-svc-dn5cl" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -o wide
+NAME                             READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+blog-db-dep-6fc6b79587-nms86     1/1     Running   0          5m57s   172.17.0.6   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-kn7fp   1/1     Running   0          19h     172.17.0.5   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-zp4cg   1/1     Running   0          19h     172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl exec -it blog-db-dep-6fc6b79587-nms86 -- mysql -uroot -pwelcome
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2
+Server version: 5.7.29 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> exit
+Bye
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -o wide
+NAME                             READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+blog-db-dep-6fc6b79587-nms86     1/1     Running   0          9m29s   172.17.0.6   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-kn7fp   1/1     Running   0          19h     172.17.0.5   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-zp4cg   1/1     Running   0          19h     172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-db-svc
+Name:              blog-db-svc
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=blog-db
+Type:              ClusterIP
+IP:                10.106.129.114
+Port:              <unset>  8888/TCP
+TargetPort:        dbport/TCP
+Endpoints:         172.17.0.6:3306
+Session Affinity:  None
+Events:
+  Type     Reason                        Age   From                       Message
+  ----     ------                        ----  ----                       -------
+  Warning  FailedToUpdateEndpointSlices  10m   endpoint-slice-controller  Error updating Endpoint Slices for Service default/blog-db-svc: Error updating blog-db-svc-dn5cl EndpointSlice for Service default/blog-db-svc: endpointslices.discovery.k8s.io "blog-db-svc-dn5cl" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f new-blog/blog-ghost.yml
+Error from server (BadRequest): error when creating "new-blog/blog-ghost.yml": Deployment in version "v1" cannot be handled as a Deployment: v1.Deployment.Spec: v1.DeploymentSpec.Template: v1.PodTemplateSpec.Spec: v1.PodSpec.Containers: []v1.Container: v1.Container.Env: []v1.EnvVar: v1.EnvVar.Value: ReadString: expects " or n, but found 8, error found in #10 byte of ...|,"value":8888},{"nam|..., bigger context ...|c"},{"name":"database__connection__port","value":8888},{"name":"database__connection__user","value":|...
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f new-blog/blog-ghost.yml
+deployment.apps/blog-ghost-dep created
+service/blog-ghost-svc created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running             0          12m
+blog-ghost-dep-745d84bc85-r4wcg   0/1     ContainerCreating   0          16s
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running             0          19h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running             0          19h
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-db-svc
+Name:              blog-db-svc
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=blog-db
+Type:              ClusterIP
+IP:                10.106.129.114
+Port:              <unset>  8888/TCP
+TargetPort:        dbport/TCP
+Endpoints:         172.17.0.6:3306
+Session Affinity:  None
+Events:
+  Type     Reason                        Age   From                       Message
+  ----     ------                        ----  ----                       -------
+  Warning  FailedToUpdateEndpointSlices  13m   endpoint-slice-controller  Error updating Endpoint Slices for Service default/blog-db-svc: Error updating blog-db-svc-dn5cl EndpointSlice for Service default/blog-db-svc: endpointslices.discovery.k8s.io "blog-db-svc-dn5cl" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-ghost-svc
+Name:                     blog-ghost-svc
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=blog-ghost
+Type:                     NodePort
+IP:                       10.111.116.8
+Port:                     <unset>  8888/TCP
+TargetPort:               ghostport/TCP
+NodePort:                 <unset>  32001/TCP
+Endpoints:                <none>
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running             0          13m
+blog-ghost-dep-745d84bc85-r4wcg   0/1     ContainerCreating   0          100s
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running             0          19h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running             0          19h
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe pod blog-ghost-dep-745d84bc85-r4wcg
+Name:           blog-ghost-dep-745d84bc85-r4wcg
+Namespace:      default
+Priority:       0
+Node:           minikube/192.168.99.100
+Start Time:     Fri, 10 Apr 2020 08:45:16 +0530
+Labels:         app=blog-ghost
+                pod-template-hash=745d84bc85
+Annotations:    <none>
+Status:         Pending
+IP:
+IPs:            <none>
+Controlled By:  ReplicaSet/blog-ghost-dep-745d84bc85
+Containers:
+  ghost:
+    Container ID:
+    Image:          ghost:1-alpine
+    Image ID:
+    Port:           2368/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       ContainerCreating
+    Ready:          False
+    Restart Count:  0
+    Environment:
+      database__client:                mysql
+      database__connection__host:      blog-db-svc
+      database__connection__port:      8888
+      database__connection__user:      root
+      database__connection__password:  welcome
+      database__connection__database:  ghost
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-vzklz (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  default-token-vzklz:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-vzklz
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  2m26s  default-scheduler  Successfully assigned default/blog-ghost-dep-745d84bc85-r4wcg to minikube
+  Normal  Pulling    2m25s  kubelet, minikube  Pulling image "ghost:1-alpine"
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -0 wide
+Error: unknown shorthand flag: '0' in -0
+See 'kubectl get --help' for usage.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods -o wide
+NAME                              READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+blog-db-dep-6fc6b79587-nms86      1/1     Running   0          13m     172.17.0.6   minikube   <none>           <none>
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running   0          2m13s   172.17.0.7   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running   0          19h     172.17.0.5   minikube   <none>           <none>
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running   0          19h     172.17.0.4   minikube   <none>           <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-ghost-svc
+Name:                     blog-ghost-svc
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=blog-ghost
+Type:                     NodePort
+IP:                       10.111.116.8
+Port:                     <unset>  8888/TCP
+TargetPort:               ghostport/TCP
+NodePort:                 <unset>  32001/TCP
+Endpoints:                172.17.0.7:2368
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl scale deploy blog-ghost-dep --replicas 2
+deployment.apps/blog-ghost-dep scaled
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe svc blog-ghost-svc
+Name:                     blog-ghost-svc
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=blog-ghost
+Type:                     NodePort
+IP:                       10.111.116.8
+Port:                     <unset>  8888/TCP
+TargetPort:               ghostport/TCP
+NodePort:                 <unset>  32001/TCP
+Endpoints:                172.17.0.7:2368,172.17.0.8:2368
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
