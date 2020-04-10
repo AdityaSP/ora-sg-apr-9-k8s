@@ -268,3 +268,160 @@ Events:                   <none>
 
 Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
 λ
+
+
+--------------------------------------------------------------------------------------------------------------
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl create -f job/job.yml
+job.batch/sayhi created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get job
+NAME    COMPLETIONS   DURATION   AGE
+sayhi   0/1           5s         5s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running             0          179m
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running             0          167m
+blog-ghost-dep-745d84bc85-x2xv8   1/1     Running             0          163m
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running             0          22h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running             0          22h
+sayhi-t8gns                       0/1     ContainerCreating   0          15s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS      RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running     0          179m
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running     0          167m
+blog-ghost-dep-745d84bc85-x2xv8   1/1     Running     0          163m
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running     0          22h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running     0          22h
+sayhi-t8gns                       0/1     Completed   0          25s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl logs sayhi-t8gns
+Hello there
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get job
+NAME    COMPLETIONS   DURATION   AGE
+sayhi   1/1           18s        62s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get job
+NAME    COMPLETIONS   DURATION   AGE
+sayhi   1/1           18s        70s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS      RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running     0          3h
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running     0          168m
+blog-ghost-dep-745d84bc85-x2xv8   1/1     Running     0          164m
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running     0          22h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running     0          22h
+sayhi-t8gns                       0/1     Completed   0          72s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods --all
+Error: unknown flag: --all
+See 'kubectl get --help' for usage.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods --show-all
+Error: unknown flag: --show-all
+See 'kubectl get --help' for usage.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl logs sayhi-t8gns
+Hello there
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl delete -f job/
+cronjob.yml  job.yml
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl delete -f job/job.yml
+job.batch "sayhi" deleted
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f job/cronjob.yml
+cronjob.batch/sayhiregularly created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get cronjob
+NAME             SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+sayhiregularly   */1 * * * *   False     0        <none>          7s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get jobs
+No resources found in default namespace.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get jobs
+No resources found in default namespace.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get jobs
+No resources found in default namespace.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get jobs
+No resources found in default namespace.
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl describe cronjob sayhiregularly
+Name:                          sayhiregularly
+Namespace:                     default
+Labels:                        <none>
+Annotations:                   Schedule:  */1 * * * *
+Concurrency Policy:            Allow
+Suspend:                       False
+Successful Job History Limit:  3
+Failed Job History Limit:      1
+Starting Deadline Seconds:     <unset>
+Selector:                      <unset>
+Parallelism:                   <unset>
+Completions:                   <unset>
+Pod Template:
+  Labels:  <none>
+  Containers:
+   hi:
+    Image:      alpine
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      echo
+      Hello there
+    Environment:     <none>
+    Mounts:          <none>
+  Volumes:           <none>
+Last Schedule Time:  <unset>
+Active Jobs:         <none>
+Events:              <none>
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get jobs
+NAME                        COMPLETIONS   DURATION   AGE
+sayhiregularly-1586499060   0/1           3s         3s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get cronjob
+NAME             SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+sayhiregularly   */1 * * * *   False     1        21s             58s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS      RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running     0          3h7m
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running     0          176m
+blog-ghost-dep-745d84bc85-x2xv8   1/1     Running     0          172m
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running     0          22h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running     0          22h
+sayhiregularly-1586499060-wdnth   0/1     Completed   0          19s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
