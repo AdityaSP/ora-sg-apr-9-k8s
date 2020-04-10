@@ -425,3 +425,87 @@ sayhiregularly-1586499060-wdnth   0/1     Completed   0          19s
 
 Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
 λ
+
+
+----------------------------------------------------------------------------------------------------------------
+
+
+ Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/pv
+pv.yml   pvc.yml
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/pv.yml
+persistentvolume/mysql-pv-volume2 created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pv
+NAME               CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+mysql-pv-volume2   2Gi        RWO            Retain           Available           manual                  27s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/pvc.yml
+persistentvolumeclaim/mysql-pv-claim1 created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pvc
+NAME              STATUS   VOLUME             CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mysql-pv-claim1   Bound    mysql-pv-volume2   2Gi        RWO            manual         5s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pv
+NAME               CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS   REASON   AGE
+mysql-pv-volume2   2Gi        RWO            Retain           Bound    default/mysql-pv-claim1   manual                  2m42s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl delete -f pv-pvc/.
+persistentvolume "mysql-pv-volume2" deleted
+persistentvolumeclaim "mysql-pv-claim1" deleted
+Error from server (NotFound): error when deleting "pv-pvc\\mysql.yml": deployments.apps "mysql" not found
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/pvc.yml
+persistentvolumeclaim/mysql-pv-claim1 created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pvc
+NAME              STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mysql-pv-claim1   Pending                                      manual         8s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/pv.yml
+persistentvolume/mysql-pv-volume2 created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pvc
+NAME              STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mysql-pv-claim1   Pending                                      manual         54s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pvc
+NAME              STATUS   VOLUME             CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mysql-pv-claim1   Bound    mysql-pv-volume2   2Gi        RWO            manual         66s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl apply -f pv-pvc/mysql.yml
+deployment.apps/mysql created
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ kubectl get pods
+NAME                              READY   STATUS              RESTARTS   AGE
+blog-db-dep-6fc6b79587-nms86      1/1     Running             0          3h55m
+blog-ghost-dep-745d84bc85-r4wcg   1/1     Running             0          3h43m
+blog-ghost-dep-745d84bc85-x2xv8   1/1     Running             0          3h39m
+helloworld-dep-7cb9c5d4b-kn7fp    1/1     Running             0          23h
+helloworld-dep-7cb9c5d4b-zp4cg    1/1     Running             0          23h
+mysql-88c98c9fc-zghkd             1/1     Running             0          7s
+sayhiregularly-1586501760-k5fgd   0/1     Completed           0          3m11s
+sayhiregularly-1586501820-wlhhw   0/1     Completed           0          2m6s
+sayhiregularly-1586501880-nrqmq   0/1     Completed           0          65s
+sayhiregularly-1586501940-r77gs   0/1     ContainerCreating   0          5s
+
+Aditya@DESKTOP-F88S8GU /d/training/k8s/k8s
+λ
